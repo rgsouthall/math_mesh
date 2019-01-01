@@ -107,7 +107,7 @@ class MESH_OT_math_mesh(bpy.types.Operator):
         pvector = (Vector((0, 0, 1)), Vector((0, 1, 0)), Vector((1, 0, 0)), context.space_data.region_3d.view_rotation@Vector((0.0, 0.0, -1.0)))[int(self.plane)]        
         vector = self.bmverts[1].co - self.bmverts[0].co
         distance = vector.length
-        t_angle = math.pi * self.cn
+        t_angle = pi * self.cn
         uvector = vector.cross((pvector)).normalized()
         lastv = self.bmverts[0].co
         vis = [self.bmverts[0]]        
