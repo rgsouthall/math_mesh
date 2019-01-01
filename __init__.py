@@ -47,9 +47,7 @@ def ret_curve(ct, alt, ang, power):
         y = (1 + y)**power - 1 if y > 0 else -1 * ((1 - y)**power - 1)
         
     return y
-
-        
-        
+       
 class MESH_OT_math_mesh(bpy.types.Operator):
     """Create a mathematical mesh curve"""
     bl_idname = "mesh.math_mesh"
@@ -95,22 +93,16 @@ class MESH_OT_math_mesh(bpy.types.Operator):
             default="0")
 
     alternate: bpy.props.BoolProperty(name="Alternate:", default = 1)
-    select: bpy.props.BoolProperty(name="Select:", default = 1)
     
-    def invoke(self, context, event):
-        if event.type == 'ESC':
-            return {'CANCELLED'}
-        return self.execute(context)
-
     def execute(self, context):
-        pvector = (mathutils.Vector((0, 0, 1)), mathutils.Vector((0, 1, 0)), mathutils.Vector((1, 0, 0)), context.space_data.region_3d.view_rotation@mathutils.Vector((0.0, 0.0, -1.0)))[int(self.plane)]
         self.bmesh = bmesh.from_edit_mesh(context.active_object.data)
         self.bmverts = [v for v in self.bmesh.verts if v.select]
         
         if not len(self.bmverts) == 2:
             self.report({'ERROR'}, 'Two vertices must be selected')
             return {'CANCELLED'}
-        
+
+        pvector = (mathutils.Vector((0, 0, 1)), mathutils.Vector((0, 1, 0)), mathutils.Vector((1, 0, 0)), context.space_data.region_3d.view_rotation@mathutils.Vector((0.0, 0.0, -1.0)))[int(self.plane)]        
         vector = self.bmverts[1].co - self.bmverts[0].co
         distance = vector.length
         t_angle = math.pi * self.cn
@@ -127,8 +119,7 @@ class MESH_OT_math_mesh(bpy.types.Operator):
 
         for vi in range(0, len(vis) - 1):
             self.bmesh.edges.new([vis[vi], vis[vi + 1]]).select = True
-            
-       
+                   
         bmesh.update_edit_mesh(context.active_object.data)    
         context.active_object.data.update()
         return {'FINISHED'}
@@ -142,8 +133,7 @@ def register():
         bpy.utils.register_class(cl)
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name='Mesh', space_type='EMPTY')
-    kmi = km.keymap_items.new("mesh.math_mesh", 'C', 'PRESS', alt=True, shift=True)
-#    kmi.properties.rdeg = 0
+    km.keymap_items.new("mesh.math_mesh", 'M', 'PRESS', alt=True, shift=True)
     addon_keymaps.append(km)
 
 def unregister():
