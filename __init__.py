@@ -25,20 +25,22 @@ bl_info = {
     "tracker_url": "https://github.com/rgsouthall/math_mesh/issues"}
 
 
-import bpy, math, mathutils, bmesh
+import bpy, bmesh
+from mathutils import Vector
+from math import pi, sin
 
 
 def ret_curve(ct, alt, ang, power):
     if ct == '0' and alt:
-        y = math.sin(ang)
+        y = sin(ang)
     
     elif ct == '0' and not alt:
-        y = abs(math.sin(ang))
+        y = abs(sin(ang))
     
     elif ct == '1':
-        odd = 1 if int(2 * ang/(2*math.pi))%2 else 0
-        ang = abs(2 * ang - int(2 * ang/(2*math.pi)) * 2 * math.pi)
-        y = -((math.pi**2 - (math.pi - ang)**2)/math.pi**2)**0.5 if odd else ((math.pi**2 - (math.pi - ang)**2)/math.pi**2)**0.5
+        odd = 1 if int(2 * ang/(2*pi))%2 else 0
+        ang = abs(2 * ang - int(2 * ang/(2*pi)) * 2 * pi)
+        y = -((pi**2 - (pi - ang)**2)/pi**2)**0.5 if odd else ((pi**2 - (pi - ang)**2)/pi**2)**0.5
         
     if not alt:
         y = abs(y)
@@ -102,14 +104,14 @@ class MESH_OT_math_mesh(bpy.types.Operator):
             self.report({'ERROR'}, 'Two vertices must be selected')
             return {'CANCELLED'}
 
-        pvector = (mathutils.Vector((0, 0, 1)), mathutils.Vector((0, 1, 0)), mathutils.Vector((1, 0, 0)), context.space_data.region_3d.view_rotation@mathutils.Vector((0.0, 0.0, -1.0)))[int(self.plane)]        
+        pvector = (Vector((0, 0, 1)), Vector((0, 1, 0)), Vector((1, 0, 0)), context.space_data.region_3d.view_rotation@Vector((0.0, 0.0, -1.0)))[int(self.plane)]        
         vector = self.bmverts[1].co - self.bmverts[0].co
         distance = vector.length
         t_angle = math.pi * self.cn
         uvector = vector.cross((pvector)).normalized()
         lastv = self.bmverts[0].co
         vis = [self.bmverts[0]]        
-        samp = self.amp * distance/(self.cn * 2) if self.ctype == '1' else self.amp * distance/(self.cn * math.pi)        
+        samp = self.amp * distance/(self.cn * 2) if self.ctype == '1' else self.amp * distance/(self.cn * pi)        
         amp = samp if self.atype == '1' else self.amp
                     
         for i in range(1, self.vn):
@@ -123,7 +125,6 @@ class MESH_OT_math_mesh(bpy.types.Operator):
         bmesh.update_edit_mesh(context.active_object.data)    
         context.active_object.data.update()
         return {'FINISHED'}
-
 
 addon_keymaps = []
 classes = (MESH_OT_math_mesh,)
