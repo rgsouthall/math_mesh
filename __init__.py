@@ -29,7 +29,6 @@ import bpy, bmesh
 from mathutils import Vector
 from math import pi, sin
 
-
 def ret_curve(ct, alt, ang, power):
     if ct == '0' and alt:
         y = sin(ang)
