@@ -56,34 +56,13 @@ class MESH_OT_math_mesh(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
 # Colons now required in 2.8 as properties are now fields
-    vn: bpy.props.IntProperty(name="No. of vertices",
-            description="Specify the number of vertices",
-            default=10, min = 1)
-    
-    cn: bpy.props.IntProperty(name="No. of curves",
-            description="Specifiy the number of oscillations",
-            default=5, min = 1)
-    
-    amp: bpy.props.FloatProperty(name="Amplitude", description="Specify the amplitude of the curve", default = 1)
-
-    atype: bpy.props.EnumProperty(
-            items=[("0", "Absolute", "Absolute amplitude value"),
-                   ("1", "Relative", "Relative anplitude value")],
-            name="Amplitude type",
-            description="Specify the amplitude type",
-            default="1")
-    
-    power: bpy.props.FloatProperty(name="Power", description="Apply a power to the curve values", default = 1, min = 0.1, max = 10)
-    
-    skew: bpy.props.FloatProperty(name="Skew", description="Apply a skew to the curve values", default = 0)
-    
     ctype: bpy.props.EnumProperty(
             items=[("0", "Sine", "Sine curve"),
                    ("1", "Circular", "Semi-circular curve")],
             name="Curve type",
             description="Specify the curve type",
             default="0")
-
+    
     plane: bpy.props.EnumProperty(
             items=[("0", "XY", "Plane the curve drawn on"),
                    ("1", "XZ", "Plane the curve drawn on"),
@@ -92,7 +71,28 @@ class MESH_OT_math_mesh(bpy.types.Operator):
             name="Curve plane",
             description="Specify the plane the curve is drawn on",
             default="0")
-
+    
+    cn: bpy.props.IntProperty(name="No. of curves",
+            description="Specifiy the number of oscillations",
+            default=5, min = 1)
+    
+    vn: bpy.props.IntProperty(name="Curve vertices",
+            description="Specify the number of vertices per curve",
+            default=10, min = 1)   
+    
+    atype: bpy.props.EnumProperty(
+            items=[("0", "Absolute", "Absolute amplitude value"),
+                   ("1", "Relative", "Relative anplitude value")],
+            name="Amplitude type",
+            description="Specify the amplitude type",
+            default="1")
+    
+    amp: bpy.props.FloatProperty(name="Amplitude", description="Specify the amplitude of the curve", default = 1)
+    
+    power: bpy.props.FloatProperty(name="Power", description="Apply a power to the curve values", default = 1, min = 0.1, max = 10)
+    
+    skew: bpy.props.FloatProperty(name="Skew", description="Apply a skew to the curve values", default = 0)
+    
     alternate: bpy.props.BoolProperty(name="Alternate:", default = 1)
     
     def execute(self, context):
@@ -107,15 +107,16 @@ class MESH_OT_math_mesh(bpy.types.Operator):
         vector = self.bmverts[1].co - self.bmverts[0].co
         distance = vector.length
         t_angle = pi * self.cn
+        t_verts = self.cn * self.vn
         uvector = vector.cross((pvector)).normalized()
         lastv = self.bmverts[0].co
         vis = [self.bmverts[0]]        
         samp = self.amp * distance/(self.cn * 2) if self.ctype == '1' else self.amp * distance/(self.cn * pi)        
         amp = samp if self.atype == '1' else self.amp
                     
-        for i in range(1, self.vn):
-            y = ret_curve(self.ctype, self.alternate, i/self.vn * t_angle, self.power)
-            vis.append(self.bmesh.verts.new(lastv + i/self.vn * vector + y * vector.normalized() * self.skew + y * uvector * amp))        
+        for i in range(1, t_verts):
+            y = ret_curve(self.ctype, self.alternate, i/t_verts * t_angle, self.power)
+            vis.append(self.bmesh.verts.new(lastv + i/t_verts * vector + y * vector.normalized() * self.skew + y * uvector * amp))        
         vis.append(self.bmverts[1])
 
         for vi in range(0, len(vis) - 1):
