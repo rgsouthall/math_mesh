@@ -22,6 +22,7 @@ bl_info = {
     "version": (0, 0, 1),
     "blender": (2, 80, 0),
     "category": "Mesh",
+    "wiki_url": "https://blendscript.blogspot.com/2019/01/blender-28-math-mesh.html",
     "tracker_url": "https://github.com/rgsouthall/math_mesh/issues"}
 
 
